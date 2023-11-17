@@ -3,7 +3,7 @@ import sentencepiece as spm
 class Tokenizer:
     def __init__(self, prefix='tiny_piece'):
         self.prefix = prefix
-        self.sp = spm.SentencePieceProcessor(f"./{self.prefix}.model")
+        self.sp = spm.SentencePieceProcessor()
 
     def encode(self, txt):
         return self.sp.encode_as_ids(txt)
@@ -27,14 +27,20 @@ class Tokenizer:
             eos_piece='[EOS]'
         )
 
-        return self
-
-    def load(self):
+        # Load the trained model after training
         self.sp.load(f'./{self.prefix}.model')
+
         return self
 
     def vocab_size(self):
         return self.sp.get_piece_size()
+
+    def save_model(self):
+        self.sp.save(f'./{self.prefix}.model')
+
+    def load_model(self):
+        self.sp.load(f'./{self.prefix}.model')
+        return self
 
 # Example Usage:
 tknz = (Tokenizer()).load()
