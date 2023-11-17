@@ -1,4 +1,5 @@
 import os
+import sentencepiece as spm
 
 class Tokenizer:
     def __init__(self, prefix='tiny_piece'):
