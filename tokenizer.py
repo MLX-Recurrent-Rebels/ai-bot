@@ -1,9 +1,9 @@
 import sentencepiece as spm
 
-
 class Tokenizer:
     def __init__(self, prefix='tiny_piece'):
         self.prefix = prefix
+        self.sp = spm.SentencePieceProcessor(f"./{self.prefix}.model")
 
     def encode(self, txt):
         return self.sp.encode_as_ids(txt)
@@ -35,3 +35,12 @@ class Tokenizer:
 
     def vocab_size(self):
         return self.sp.get_piece_size()
+
+# Example Usage:
+# tknz = Tokenizer()
+# tknz.train('./your_text_corpus.txt').load()
+# print("Vocabulary Size:", tknz.vocab_size())
+# ids = tknz.encode('hello world')
+# print("Encoded IDs:", ids)
+# decoded_text = tknz.decode(ids)
+# print("Decoded Text:", decoded_text)
