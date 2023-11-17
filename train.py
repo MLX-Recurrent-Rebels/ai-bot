@@ -15,10 +15,10 @@ myT5 = t5.T5().to(device)
 myT5.num_params()
 
 
-tk = (tokenizer.LangTokenizer()).load()
-ds = dataset.LangDataset()
-dl = torch.utils.data.DataLoader(ds, batch_size=64, shuffle=True, collate_fn=ds.collate_fn)
-opt = torch.optim.Adam(myT5.parameters(), lr=0.0001)
+tk = (tokenizer.Tokenizer()).load()
+ds = dataset.TinyOrcaDataset()
+dl = torch.utils.data.DataLoader(ds, batch_size=10, shuffle=True, collate_fn=ds.collate_fn)
+opt = torch.optim.SGD(myGPT.parameters(), lr=0.05)
 
 
 for epoch in range(5):
