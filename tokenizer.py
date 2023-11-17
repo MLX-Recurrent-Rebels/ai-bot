@@ -1,4 +1,4 @@
-import sentencepiece as spm
+import os
 
 class Tokenizer:
     def __init__(self, prefix='tiny_piece'):
@@ -39,7 +39,13 @@ class Tokenizer:
         self.sp.save(f'./{self.prefix}.model')
 
     def load_model(self):
-        self.sp.load(f'./{self.prefix}.model')
+        model_path = f'./{self.prefix}.model'
+        if os.path.exists(model_path):
+            self.sp.load(model_path)
+            print(f"Model loaded from {model_path}")
+        else:
+            print(f"Model file {model_path} not found. Train the model first.")
+
         return self
 
 # Example Usage:
