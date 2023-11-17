@@ -4,7 +4,6 @@ import sentencepiece as spm
 class Tokenizer:
     def __init__(self, prefix='tiny_piece'):
         self.prefix = prefix
-        self.sp = spm.SentencePieceProcessor(f"./{self.prefix}.model")
 
     def encode(self, txt):
         return self.sp.encode_as_ids(txt)
