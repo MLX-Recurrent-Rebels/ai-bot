@@ -52,7 +52,7 @@ if __name__ == '__main__':
     from dataset import TinyOrcaDataset
 
     # Specify the path to your dataset
-    dataset_path = './your_dataset.txt'
+    dataset_path = 'nampdn-ai/tiny-orca-textbooks'
 
     # Train the tokenizer on your dataset
     tknz.train(dataset_path)
