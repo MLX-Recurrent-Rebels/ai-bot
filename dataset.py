@@ -4,7 +4,7 @@ import tokenizer  # Assuming you have a tokenizer module
 
 class TinyOrcaDataset(torch.utils.data.Dataset):
     def __init__(self):
-        self.column_names = ['textbook', 'question', 'resonse']
+        self.column_names = ['textbook', 'question', 'response']
         ds = load_dataset("nampdn-ai/tiny-orca-textbooks", 'r')
         self.ds = ds
         self.tknz = tokenizer.Tokenizer()
