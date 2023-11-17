@@ -8,7 +8,8 @@ class Tokenizer:
         self.vocab_size = len(self.vocab)
 
     def encode(self, name):
-        return [self.stoi[c] for c in name]
+        return [self.stoi.get(c, self.stoi['<unk>']) for c in name]
+
 
     def decode(self, tokens):
         return ''.join([self.itos[t] for t in tokens if self.itos[t] not in ('<sos>', '<eos>', '<pad>')])
