@@ -1,90 +1,49 @@
 import torch
-import pandas
-import tokenizer
+from datasets import load_dataset
+import tokenizer  # Assuming you have a tokenizer module
 
+class TinyOrcaDataset(torch.utils.data.Dataset):
+    def __init__(self):
+        ds = load_dataset("nampdn-ai/tiny-orca-textbooks", 'r')
+        self.ds = ds
+        self.tknz = tokenizer.Tokenizer()
 
-class Dataset(torch.utils.data.Dataset):
-  def __init__(self):
-    f = load_dataset("nampdn-ai/tiny-orca-textbooks", 'r')
-    self.names = f.read().split('\n')
-    self.tknz  = tokenizer.Tokenizer()
-    f.close()
+    def __len__(self):
+        return len(self.ds['train'])  # Use 'train' directly
 
-  def __len__(self):
-    return len(self.names)
+    def __getitem__(self, idx):
+        entry = self.ds['train'][idx]  # Access 'train' directly
+        textbook, question, response = entry['textbook'], entry['question'], entry['response']
 
-  def __getitem__(self, idx):
-    name  = self.names[idx]
-    input = [self.tknz.stoi['<sos>']] + self.tknz.encode(name)
-    label = (input[1:]) + [self.tknz.stoi['<eos>']]
-    masks = [1] * len(input)
-    return {
-      'plain': name,
-      'input': torch.tensor(input),
-      'label': torch.tensor(label),
-      'masks': torch.tensor(masks),
-    }
+        input_text = [self.tknz.stoi['<sos>']] + self.tknz.encode(textbook)
+        label_text = input_text[1:] + [self.tknz.stoi['<eos>']]
+        masks = [1] * len(input_text)
 
-  # The input batch is a list of tensors with different
-  # lengths. We use pad_sequence to pad the tensors with
-  # 0s so that they all have the same length.
-  def collate_fn(self, batch):
-    input_pad = torch.nn.utils.rnn.pad_sequence([item['input'] for item in batch], batch_first=True, padding_value=0)
-    label_pad = torch.nn.utils.rnn.pad_sequence([item['label'] for item in batch], batch_first=True, padding_value=0)
-    masks_pad = torch.nn.utils.rnn.pad_sequence([item['masks'] for item in batch], batch_first=True, padding_value=0)
+        return {
+            'textbook': textbook,
+            'question': question,
+            'response': response,
+            'input': torch.tensor(input_text),
+            'label': torch.tensor(label_text),
+            'masks': torch.tensor(masks),
+        }
 
-    return {
-      'plain': [item['plain'] for item in batch],
-      'input': input_pad,
-      'label': label_pad,
-      'masks': masks_pad,
-    }
+    def collate_fn(self, batch):
+        input_pad = torch.nn.utils.rnn.pad_sequence([item['input'] for item in batch], batch_first=True, padding_value=0)
+        label_pad = torch.nn.utils.rnn.pad_sequence([item['label'] for item in batch], batch_first=True, padding_value=0)
+        masks_pad = torch.nn.utils.rnn.pad_sequence([item['masks'] for item in batch], batch_first=True, padding_value=0)
 
-
-class LangDataset(torch.utils.data.Dataset):
-  def __init__(self):
-    self.column_names = ['id_eng', 'eng', 'id_ita', 'ita']
-    self.df = pandas.read_csv('./eng_ita.tsv', delimiter='\t', encoding='utf-8', on_bad_lines='skip', header=None, names=self.column_names)
-    self.tk  = tokenizer.LangTokenizer()
-    self.tk.load()
-
-  def __len__(self):
-    return len(self.df)
-
-  def __getitem__(self, idx):
-    row = self.df.iloc[idx]
-    contx = self.tk.encode(row['eng'])
-    input = [self.tk.sp.bos_id()] + self.tk.encode(row['ita'])
-    label = (self.tk.encode(row['ita'])) + [self.tk.sp.eos_id()]
-    return {
-      'txt_eng': row['eng'],
-      'txt_ita': row['ita'],
-      'contx': torch.tensor(contx),
-      'input': torch.tensor(input),
-      'label': torch.tensor(label),
-    }
-
-  def collate_fn(self, batch):
-    contx_pad = torch.nn.utils.rnn.pad_sequence([item['contx'] for item in batch], batch_first=True, padding_value=0)
-    input_pad = torch.nn.utils.rnn.pad_sequence([item['input'] for item in batch], batch_first=True, padding_value=0)
-    label_pad = torch.nn.utils.rnn.pad_sequence([item['label'] for item in batch], batch_first=True, padding_value=0)
-
-    return {
-      'eng': [item['txt_eng'] for item in batch],
-      'ita': [item['txt_ita'] for item in batch],
-      'contx': contx_pad,
-      'input': input_pad,
-      'label': label_pad,
-    }
+        return {
+            'textbook': [item['textbook'] for item in batch],
+            'question': [item['question'] for item in batch],
+            'response': [item['response'] for item in batch],
+            'input': input_pad,
+            'label': label_pad,
+            'masks': masks_pad,
+        }
 
 if __name__ == '__main__':
-  # ds = Dataset()
-  # emma = ds[0]
-  # print('emma', emma)
-  # 'plain': 'emma'
-  # 'input': tensor([ 7, 15, 15,  3])
-  # 'label': tensor([15, 15,  3,  1])
-  # 'masks': tensor([ 1,  1,  1,  1])
-  ds = LangDataset()
-  print('len(ds)', len(ds))
-  print('ds[362]', ds[362])
+    ds = TinyOrcaDataset()
+    print('len(ds)', len(ds))
+    print('ds[0]', ds[0])
+
