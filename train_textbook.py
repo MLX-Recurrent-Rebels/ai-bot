@@ -15,15 +15,15 @@ myT5 = t5.T5().to(device)
 myT5.num_params()
 
 
-tk = (tokenizer.LangTokenizer()).load()
-ds = dataset.LangDataset()
+tk = (tokenizer.Tokenizer()).load()
+ds = dataset.TinyOrcaDataset()
 dl = torch.utils.data.DataLoader(ds, batch_size=64, shuffle=True, collate_fn=ds.collate_fn)
 opt = torch.optim.Adam(myT5.parameters(), lr=0.0001)
 
 
 for epoch in range(5):
 
-  org = "Hello my name is Bes and I work in the field of AI."
+  org = "Ask me a question. I am a textbook."
   src = torch.tensor([tk.encode(org)]).to(device)
   trs = myT5.translate(src)
   print(f"{org} - {tk.decode(trs.tolist()[0])}")
