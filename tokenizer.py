@@ -43,7 +43,7 @@ class Tokenizer:
         return self
 
 # Example Usage:
-tknz = (Tokenizer()).load()
+tknz = (Tokenizer()).load_model()
 
 #tknz.train('./your_text_corpus.txt').load()
 print("Vocabulary Size:", tknz.vocab_size())
