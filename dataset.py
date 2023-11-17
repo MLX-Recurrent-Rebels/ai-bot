@@ -43,3 +43,15 @@ class TinyOrcaDataset(torch.utils.data.Dataset):
             'masks': masks_pad,
         }
 
+if __name__ == '__main__':
+  # ds = Dataset()
+  # emma = ds[0]
+  # print('emma', emma)
+  # 'plain': 'emma'
+  # 'input': tensor([ 7, 15, 15,  3])
+  # 'label': tensor([15, 15,  3,  1])
+  # 'masks': tensor([ 1,  1,  1,  1])
+  ds = TinyOrcaDataset()
+  print('len(ds)', len(ds))
+  print('ds[362]', ds[362])
+
