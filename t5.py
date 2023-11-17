@@ -120,7 +120,7 @@ class T5(torch.nn.Module):
     print(f"Total Parameters: {gpt_params} | Embedding: {emb_params}")
     return { 'gpt_params': gpt_params, 'emb_params': emb_params }
 
-  def translate(self, src, num=20):
+  def answer(self, src, num=20):
     self.eval()
     tgt = torch.tensor([[2]], device=device)
     for _ in range(num):
