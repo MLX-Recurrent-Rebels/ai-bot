@@ -37,10 +37,15 @@ class Tokenizer:
         return self.sp.get_piece_size()
 
 # Example Usage:
-# tknz = Tokenizer()
-# tknz.train('./your_text_corpus.txt').load()
-# print("Vocabulary Size:", tknz.vocab_size())
-# ids = tknz.encode('hello world')
-# print("Encoded IDs:", ids)
-# decoded_text = tknz.decode(ids)
-# print("Decoded Text:", decoded_text)
+  tknz = (LangTokenizer()).load()
+
+#tknz.train('./your_text_corpus.txt').load()
+print("Vocabulary Size:", tknz.vocab_size())
+ids = tknz.encode('hello world')
+print("Encoded IDs:", ids)
+  print('tknz.sp.bos_id()', tknz.sp.bos_id())
+  print('tknz.sp.pad_id()', tknz.sp.pad_id())
+  print('tknz.sp.eos_id()', tknz.sp.eos_id())
+  print('tknz.sp.unk_id()', tknz.sp.unk_id())
+decoded_text = tknz.decode(ids)
+print("Decoded Text:", decoded_text)
