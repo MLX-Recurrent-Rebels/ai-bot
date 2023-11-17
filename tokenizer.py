@@ -37,7 +37,7 @@ class Tokenizer:
         return self.sp.get_piece_size()
 
 # Example Usage:
-tknz = (LangTokenizer()).load()
+tknz = (Tokenizer()).load()
 
 #tknz.train('./your_text_corpus.txt').load()
 print("Vocabulary Size:", tknz.vocab_size())
