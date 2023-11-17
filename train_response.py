@@ -18,9 +18,9 @@ opt = torch.optim.SGD(myGPT.parameters(), lr=0.01)
 for epoch in range(10):
 
   sos = torch.tensor([[2]])
-  name = myGPT.generate(sos)
-  name = name[0].tolist()
-  print("Name:", tk.decode(name))
+  response = myGPT.generate(sos)
+  response = response[0].tolist()
+  print("Response:", tk.decode(response))
 
   for idx, batch in enumerate(dl):
 
