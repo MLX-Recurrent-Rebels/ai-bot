@@ -1,3 +1,7 @@
+Using Bes' Picoformer with tiny-orca-texbooks dataset
+
+
+
 # PicoFormer
 
 Simple examples of Transformers.
