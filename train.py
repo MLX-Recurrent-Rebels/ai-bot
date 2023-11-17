@@ -1,59 +1,45 @@
 import torch
-import gpt
+import t5
 import dataset
 import tokenizer
+import random
 
 
+is_cuda = torch.cuda.is_available()
+device = "cuda:0" if is_cuda else "cpu"
+
+
+random.seed(42)
 torch.manual_seed(42)
-myGPT = gpt.GPT()
-myGPT.num_params()
+myT5 = t5.T5().to(device)
+myT5.num_params()
 
 
-tk = tokenizer.Tokenizer()
-ds = dataset.Dataset()
-dl = torch.utils.data.DataLoader(ds, batch_size=8, shuffle=True, collate_fn=ds.collate_fn)
-opt = torch.optim.SGD(myGPT.parameters(), lr=0.01)
+tk = (tokenizer.LangTokenizer()).load()
+ds = dataset.LangDataset()
+dl = torch.utils.data.DataLoader(ds, batch_size=64, shuffle=True, collate_fn=ds.collate_fn)
+opt = torch.optim.Adam(myT5.parameters(), lr=0.0001)
 
 
-for epoch in range(10):
+for epoch in range(5):
 
-  sos = torch.tensor([[2]])
-  response = myGPT.generate(sos)
-  response = response[0].tolist()
-  print("Response:", tk.decode(response))
+  org = "Please ask me a question. I am a textbook."
+  src = torch.tensor([tk.encode(org)]).to(device)
+  trs = myT5.translate(src)
+  print(f"{org} - {tk.decode(trs.tolist()[0])}")
 
   for idx, batch in enumerate(dl):
 
-    # print("batch['input']", batch['input'].shape, batch['input'])
-    # print("batch['label']", batch['label'].shape, batch['label'])
-    # print("batch['masks']", batch['masks'].shape, batch['masks'])
-
-    x = batch['input']
-    y = batch['label']
-    p = myGPT(x)
-
-    # Cross Entropy Loss expects a 2D tensor of size (N, C)
-    # and a 1D tensor of size (N) as input, where N is the
-    # batch size and C is the number of classes. E.g.
-    #
-    # p -> (8, 16, 29) -> (8*16, 29) -> (128, 29)
-    # y -> (8, 16)     -> (8*16)     -> (128)
+    c = batch['contx'].to(device)
+    x = batch['input'].to(device)
+    y = batch['label'].to(device)
+    p = myT5(c, x)
 
     p = p.view(-1, p.size(-1))
     y = y.view(-1)
-
     l = torch.nn.functional.cross_entropy(p, y, ignore_index=0)
-
-    # Initially, a randomly initialized model will predict
-    # on average, a uniform distribution over the vocabulary.
-    # Thus the probability of a token is 1/vocab_size ~ 1/29.
-    # Therefore the loss will be -ln(1/29) ~ 3.37 for each
-    # token. The loss for each token is then averaged over the
-    # sequence length i.e.
-    #
-    # loss = -ln(1/29) ~ 3.37
-
-    if idx % 1000 == 0: print("Loss:", l.item())
+    if idx % 1000 == 0: print(f"Loss: {l.item():.4f}")
+    if idx % 5000 == 0: torch.save(myT5.state_dict(), f"weights_{epoch}_{idx}.pt")
     l.backward()
     opt.step()
     opt.zero_grad()
