@@ -43,8 +43,3 @@ class TinyOrcaDataset(torch.utils.data.Dataset):
             'masks': masks_pad,
         }
 
-if __name__ == '__main__':
-    ds = TinyOrcaDataset()
-    print('len(ds)', len(ds))
-    print('ds[0]', ds[0])
-
