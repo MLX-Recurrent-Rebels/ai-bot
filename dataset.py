@@ -5,7 +5,7 @@ import tokenizer
 
 class Dataset(torch.utils.data.Dataset):
   def __init__(self):
-    f = open('./names.txt', 'r')
+    f = load_dataset("nampdn-ai/tiny-orca-textbooks", 'r')
     self.names = f.read().split('\n')
     self.tknz  = tokenizer.Tokenizer()
     f.close()
